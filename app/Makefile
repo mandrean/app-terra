@@ -27,7 +27,7 @@ include $(BOLOS_SDK)/Makefile.defines
 # Main app configuration
 APPNAME = "Terra"
 APPVERSION_M=1
-APPVERSION_N=2
+APPVERSION_N=3
 APPVERSION_P=0
 
 APPPATH = "44'/330'"
@@ -76,8 +76,13 @@ DEFINES       += LEDGER_MAJOR_VERSION=$(APPVERSION_M) LEDGER_MINOR_VERSION=$(APP
 
 DEFINES       += USB_SEGMENT_SIZE=64
 DEFINES       += HAVE_BOLOS_APP_STACK_CANARY
+DEFINES       += HAVE_UX_FLOW
 DEFINES       += NDEBUG
 
+# U2F
+DEFINES       += HAVE_U2F HAVE_IO_U2F U2F_PROXY_MAGIC=\"terra\"
+
+# WebUSB
 DEFINES       += HAVE_WEBUSB WEBUSB_URL_SIZE_B=0 WEBUSB_URL=""
 
 ifeq ($(TARGET_NAME),TARGET_NANOX)
@@ -90,16 +95,15 @@ DEFINES       += HAVE_BAGL_FONT_OPEN_SANS_REGULAR_11PX
 DEFINES       += HAVE_BAGL_FONT_OPEN_SANS_EXTRABOLD_11PX
 DEFINES       += HAVE_BAGL_FONT_OPEN_SANS_LIGHT_16PX
 
-DEFINES       += HAVE_UX_FLOW
-
 DEFINES       += HAVE_BLE
 DEFINES       += HAVE_BLE_APDU BLE_COMMAND_TIMEOUT_MS=2000
+DEFINES       += BLE_SEGMENT_SIZE=32 #max MTU, min 20
 
 SDK_SOURCE_PATH  += lib_blewbxx lib_blewbxx_impl
 else
 # Assume Nano S
 DEFINES       += IO_SEPROXYHAL_BUFFER_SIZE_B=128
-DEFINES       += COMPLIANCE_UX_160 HAVE_UX_LEGACY HAVE_UX_FLOW
+DEFINES       += COMPLIANCE_UX_160 HAVE_UX_LEGACY
 endif
 
 # X specific
@@ -153,9 +157,7 @@ APP_SOURCE_PATH += $(MY_DIR)/../deps/ledger-zxlib/src
 APP_SOURCE_PATH += $(MY_DIR)/../deps/ledger-zxlib/app/common
 APP_SOURCE_PATH += $(MY_DIR)/../deps/jsmn/src
 
-SDK_SOURCE_PATH += lib_stusb lib_stusb_impl
-
-SDK_SOURCE_PATH  += lib_ux
+SDK_SOURCE_PATH += lib_stusb lib_stusb_impl lib_u2f lib_ux
 
 # Import generic rules from the SDK
 include $(BOLOS_SDK)/Makefile.rules
